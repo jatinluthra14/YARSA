@@ -2,12 +2,54 @@ import os
 import sys
 import requests
 import re
-from Crypto.Util.number import long_to_bytes
+from Crypto.Util.number import long_to_bytes, inverse
 import argparse
 
 class YARSA:
     def __init__(self, **kwargs):
+        self.n = None
+        self.e = None
+        self.c = None
+        self.d = None
+        self.phi = None
+        self.m =None
         self.__dict__.update(kwargs)
+        self.session = requests.session()
+
+    def factorize(self):
+        factordb = self.factordb()
+        if factordb:
+            return True
+        else:
+            print("Couldn't Find Factors")
+            return False
+    
+    def factordb(self):
+        base_url = "http://factordb.com/api"
+        results = self.session.get(base_url, params={"query": str(self.n)}).json()
+        if results['status'] != 'CF' and results['status'] != 'FF':
+            return False
+        else:
+            self.phi = 1
+            for factor in results['factors']:
+                self.phi *= (int(factor[0]) - 1) ** factor[1]
+            return True
+
+    def final_dec(self):
+        self.d = inverse(self.e, self.phi)
+        self.m = pow(self.c, self.d, self.n)
+        if self.m:
+            return True
+        else:
+            print("Couldn't Decrypt")
+            return False
+    def print_dec(self):
+        print('-----------------------------------------------------------')
+        print(f"DEC: {self.m}")
+        print(f"HEX: {hex(self.m)}")
+        print(f"ASCII: {long_to_bytes(self.m).decode('utf-8', errors='ignore')}")
+        print('-----------------------------------------------------------')
+
 
 def extract_params(params_file):
     params = dict()
@@ -61,4 +103,9 @@ if __name__ == "__main__":
         exit(0)
     
     params = extract_params(args.params_file)
-    print(params)
+    yarsa = YARSA(**params)
+    factors = yarsa.factorize()
+    if factors:
+        final_dec = yarsa.final_dec()
+        if final_dec:
+            yarsa.print_dec()
