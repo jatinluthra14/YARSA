@@ -1,0 +1,4 @@
+[submodule "modules/wiener"]
+	path = modules/wiener
+	url = https://github.com/pablocelayes/rsa-wiener-attack
+	ignore = dirty

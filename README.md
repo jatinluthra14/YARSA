@@ -14,6 +14,20 @@ Yet Another RSA Toolkit
 * Multi-Prime RSA
 * Chinese Remainder Attack
 
+# Installation
+* Clone the Repository
+`git clone --recurse-submodules https://github.com/jatinluthra14/YARSA && cd YARSA`
+
+* Install gmpy2
+YARSA requires gmpy2 which needs to be installed on your OS
+For Linux:
+`sudo apt-get install libgmp3-dev`
+
+* Install rest requiremnts
+`pip install -r requirements`
+
+# Extra Libraries
+* [Wiener Attack](https://github.com/pablocelayes/rsa-wiener-attack)
 # TODO
 * Implement the features
 * Add alpertron factorization support
