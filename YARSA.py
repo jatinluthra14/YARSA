@@ -43,6 +43,7 @@ class YARSA:
         else:
             print("Couldn't Decrypt")
             return False
+    
     def print_dec(self):
         print('-----------------------------------------------------------')
         print(f"DEC: {self.m}")
@@ -50,6 +51,8 @@ class YARSA:
         print(f"ASCII: {long_to_bytes(self.m).decode('utf-8', errors='ignore')}")
         print('-----------------------------------------------------------')
 
+    def search_for_attacks(self):
+        pass
 
 def extract_params(params_file):
     params = dict()
@@ -95,7 +98,8 @@ def extract_params(params_file):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Yet Another RSA Toolkit")
-    parser.add_argument('--params-file', help='file which store params like n, e, c and/or others')
+    parser.add_argument('-pf','--params-file', help='file which store params like n, e, c and/or others')
+    parser.add_argument('-na','--no-attacks', help='skip attacks and try old school RSA decryption', action='store_true')
     args = parser.parse_args()
     
     if len(sys.argv) < 2:
@@ -104,6 +108,8 @@ if __name__ == "__main__":
     
     params = extract_params(args.params_file)
     yarsa = YARSA(**params)
+    if not args.no_attacks:
+        yarsa.search_for_attacks()
     factors = yarsa.factorize()
     if factors:
         final_dec = yarsa.final_dec()
