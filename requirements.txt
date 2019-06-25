@@ -1,12 +1,15 @@
 astroid==2.2.5
 certifi==2019.6.16
 chardet==3.0.4
+factordb-pycli==1.2.0
+gmpy==1.17
 gmpy2==2.0.8
 idna==2.8
 isort==4.3.20
 lazy-object-proxy==1.4.1
 mccabe==0.6.1
 pkg-resources==0.0.0
+git+git://github.com/elliptic-shiho/primefac-fork@master#egg=primefac
 pycryptodome==3.8.2
 pylint==2.3.1
 requests==2.22.0

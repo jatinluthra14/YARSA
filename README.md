@@ -13,7 +13,7 @@ Yet Another RSA Toolkit
 * Simple RSA Decryption
 * Factorization of n if p and q not given (Using factordb and alpertron)
 * Small e Attack
-* Weiner's Small d Attach
+* Weiner's Small d Attack
 * Multi-Prime RSA
 * Chinese Remainder Attack
 
@@ -32,9 +32,10 @@ Yet Another RSA Toolkit
 * Install rest requiremnts
 `pip install -r requirements`
 
-## Extra Libraries
+## Extra Libraries (INCLUDED)
 
 * [Wiener Attack](https://github.com/pablocelayes/rsa-wiener-attack)
+* [primefac-fork](https://github.com/elliptic-shiho/primefac-fork)
 
 ## TODO
 

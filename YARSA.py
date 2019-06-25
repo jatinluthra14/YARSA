@@ -5,6 +5,7 @@ import re
 from Crypto.Util.number import long_to_bytes, inverse
 import argparse
 import gmpy2
+import primefac
 from contextlib import contextmanager
 
 @contextmanager
@@ -74,13 +75,27 @@ class YARSA:
         gmpy2.get_context().precision=50000
 
     def factorize(self):
-        factordb = self.factordb()
-        if factordb:
+        print("Finding Primes on factordb")
+        if self.factordb():
             return True
         else:
-            print("Couldn't Find Factors")
-            return False
+            print("Trying Last Resort! (If it hangs, quit!!)")
+            if self.find_primes():
+                return True
+            else:
+                return False
     
+    def find_primes(self):
+        try:
+            list_primes = list(primefac.primefac(self.n))
+            self.phi = 1
+            for prime in list_primes:
+                self.phi *= int(prime) - 1
+            return True
+        except:
+            return False
+
+            
     def factordb(self):
         base_url = "http://factordb.com/api"
         results = self.session.get(base_url, params={"query": str(self.n)}).json()
