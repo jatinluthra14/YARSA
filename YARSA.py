@@ -63,13 +63,14 @@ def extract_params(params_file):
 
 
 class YARSA:
-    def __init__(self, **kwargs):
+    def __init__(self, args, **kwargs):
         self.n = None
         self.e = None
         self.c = None
         self.d = None
         self.phi = None
         self.m =None
+        self.args = args
         self.__dict__.update(kwargs)
         self.session = requests.session()
         gmpy2.get_context().precision=50000
@@ -88,6 +89,9 @@ class YARSA:
     def find_primes(self):
         try:
             list_primes = list(primefac.primefac(self.n))
+            if args.list_primes:
+                print("Found Prime Factors:")
+                print(list_primes)
             self.phi = 1
             for prime in list_primes:
                 self.phi *= int(prime) - 1
@@ -102,6 +106,9 @@ class YARSA:
         if results['status'] != 'CF' and results['status'] != 'FF':
             return False
         else:
+            if args.list_primes:
+                print("Found Factors:")
+                print(results['factors'])
             self.phi = 1
             for factor in results['factors']:
                 self.phi *= (int(factor[0]) - 1) ** factor[1]
@@ -162,6 +169,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("Yet Another RSA Toolkit")
     parser.add_argument('-pf','--params-file', help='file which store params like n, e, c and/or others')
     parser.add_argument('-na','--no-attacks', help='skip attacks and try old school RSA decryption', action='store_true')
+    parser.add_argument('-lp','--list-primes', help='list all the prime factors if found', action='store_true')
     args = parser.parse_args()
     
     if len(sys.argv) < 2:
@@ -169,7 +177,7 @@ if __name__ == "__main__":
         exit(0)
     
     params = extract_params(args.params_file)
-    yarsa = YARSA(**params)
+    yarsa = YARSA(args, **params)
     if not args.no_attacks:
         yarsa.search_for_attacks()
     factors = yarsa.factorize()

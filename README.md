@@ -39,5 +39,6 @@ Yet Another RSA Toolkit
 
 ## TODO
 
-* Implement the features
 * Add alpertron factorization support
+* Implement Chinese Remainder Theorem
+* Implement Close Prime Difference Attack
