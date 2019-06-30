@@ -172,10 +172,9 @@ if __name__ == "__main__":
     parser.add_argument('-lp','--list-primes', help='list all the prime factors if found', action='store_true')
     args = parser.parse_args()
     
-    if len(sys.argv) < 2:
-        print('Please choose an option!')
+    if not args.params_file:
+        print("Please specify the params!")
         exit(0)
-    
     params = extract_params(args.params_file)
     yarsa = YARSA(args, **params)
     if not args.no_attacks:
