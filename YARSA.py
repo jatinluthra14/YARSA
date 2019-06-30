@@ -7,6 +7,7 @@ import argparse
 import gmpy2
 import primefac
 from contextlib import contextmanager
+import pyperclip
 
 @contextmanager
 def suppress_stdout():
@@ -18,10 +19,17 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
-def extract_params(params_file):
+def extract_params(**kwargs):
     params = dict()
-    with open(params_file,"r") as fp:
-        file_contents = fp.read()
+    if 'params_file' in kwargs:
+        with open(kwargs['params_file'],"r") as fp:
+            file_contents = fp.read()
+    elif 'clipboard' in kwargs:
+        file_contents = pyperclip.paste()
+        print("Copied Clipboard Contents:\n"+file_contents)
+    else:
+        print("No Params specified!")
+        exit(0)
 
     n = re.search('[n|N]\s*[:=()]+\s*(.*)', file_contents)
     p = re.search('[p|P]\s*[:=()]+\s*(.*)', file_contents)
@@ -168,14 +176,18 @@ class YARSA:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Yet Another RSA Toolkit")
     parser.add_argument('-pf','--params-file', help='file which store params like n, e, c and/or others')
+    parser.add_argument('-cp','--clipboard', help='copy params from clipboard automatically', action='store_true')
     parser.add_argument('-na','--no-attacks', help='skip attacks and try old school RSA decryption', action='store_true')
     parser.add_argument('-lp','--list-primes', help='list all the prime factors if found', action='store_true')
     args = parser.parse_args()
     
-    if not args.params_file:
+    if not args.params_file and not args.clipboard:
         print("Please specify the params!")
         exit(0)
-    params = extract_params(args.params_file)
+    elif args.params_file:
+        params = extract_params(params_file=args.params_file)
+    else:
+        params = extract_params(clipboard=True)
     yarsa = YARSA(args, **params)
     if not args.no_attacks:
         yarsa.search_for_attacks()
