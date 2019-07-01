@@ -132,16 +132,13 @@ class YARSA:
             print("Couldn't Decrypt")
             return False
     
-    def print_dec(self):
-        print('-----------------------------------------------------------')
-        print(f"DEC: {self.m}")
-        print(f"HEX: {hex(self.m)}")
-        print(f"ASCII: {long_to_bytes(self.m).decode('utf-8', errors='ignore')}")
-        print('-----------------------------------------------------------')
+    def formatted(self, s):
+        return f"-----------------------------------------------------------\nDEC: {self.m}\nHEX: {hex(self.m)}\nASCII: {long_to_bytes(self.m).decode('utf-8', errors='ignore')}\n-----------------------------------------------------------"
 
     def search_for_attacks(self):
         if self.small_e():
             print("Attacking RSA with small e")
+            result = self.formatted(self.m)
             self.print_dec()
             exit(0)
         if self.wiener():
@@ -172,6 +169,9 @@ class YARSA:
         else:
             return False
 
+    def print_dec(self):
+        result = self.formatted(self.m)
+        print(result)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Yet Another RSA Toolkit")
