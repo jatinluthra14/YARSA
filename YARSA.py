@@ -26,9 +26,11 @@ def extract_params(**kwargs):
             file_contents = fp.read()
     elif 'clipboard' in kwargs:
         file_contents = pyperclip.paste()
-        print("Copied Clipboard Contents:\n"+file_contents)
+        if not kwargs['silent']:
+            print("Copied Clipboard Contents:\n"+file_contents)
     else:
-        print("No Params specified!")
+        if not kwargs['silent']:
+            print("No Params specified!")
         exit(0)
 
     n = re.search('[n|N]\s*[:=()]+\s*(.*)', file_contents)
@@ -84,11 +86,11 @@ class YARSA:
         gmpy2.get_context().precision=50000
 
     def factorize(self):
-        print("Finding Primes on factordb")
+        self.print_not_silent("Finding Primes on factordb")
         if self.factordb():
             return True
         else:
-            print("Trying Last Resort! (If it hangs, quit!!)")
+            self.print_not_silent("Trying Last Resort! (If it hangs, quit!!)")
             if self.find_primes():
                 return True
             else:
@@ -98,8 +100,8 @@ class YARSA:
         try:
             list_primes = list(primefac.primefac(self.n))
             if args.list_primes:
-                print("Found Prime Factors:")
-                print(list_primes)
+                self.print_not_silent("Found Prime Factors:")
+                self.print_not_silent(list_primes)
             self.phi = 1
             for prime in list_primes:
                 self.phi *= int(prime) - 1
@@ -115,8 +117,8 @@ class YARSA:
             return False
         else:
             if args.list_primes:
-                print("Found Factors:")
-                print(results['factors'])
+                self.print_not_silent("Found Factors:")
+                self.print_not_silent(results['factors'])
             self.phi = 1
             for factor in results['factors']:
                 self.phi *= (int(factor[0]) - 1) ** factor[1]
@@ -129,7 +131,7 @@ class YARSA:
         if self.m:
             return True
         else:
-            print("Couldn't Decrypt")
+            self.print_not_silent("Couldn't Decrypt")
             return False
     
     def formatted(self, s):
@@ -137,12 +139,12 @@ class YARSA:
 
     def search_for_attacks(self):
         if self.small_e():
-            print("Attacking RSA with small e")
+            self.print_not_silent("Attacking RSA with small e")
             result = self.formatted(self.m)
             self.print_dec()
             exit(0)
         if self.wiener():
-            print('Hit Wiener Attack!')
+            self.print_not_silent('Hit Wiener Attack!')
             self.print_dec()
             exit(0)
     
@@ -169,6 +171,10 @@ class YARSA:
         else:
             return False
 
+    def print_not_silent(self, s):
+        if not self.args.silent:
+            print(s)
+
     def print_dec(self):
         result = self.formatted(self.m)
         print(result)
@@ -179,15 +185,16 @@ if __name__ == "__main__":
     parser.add_argument('-cp','--clipboard', help='copy params from clipboard automatically', action='store_true')
     parser.add_argument('-na','--no-attacks', help='skip attacks and try old school RSA decryption', action='store_true')
     parser.add_argument('-lp','--list-primes', help='list all the prime factors if found', action='store_true')
+    parser.add_argument('-s','--silent', help='just print the plaintext', action='store_true')
     args = parser.parse_args()
     
     if not args.params_file and not args.clipboard:
         print("Please specify the params!")
         exit(0)
     elif args.params_file:
-        params = extract_params(params_file=args.params_file)
+        params = extract_params(params_file=args.params_file, silent=args.silent)
     else:
-        params = extract_params(clipboard=True)
+        params = extract_params(clipboard=True, silent=args.silent)
     yarsa = YARSA(args, **params)
     if not args.no_attacks:
         yarsa.search_for_attacks()
