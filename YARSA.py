@@ -8,6 +8,7 @@ import gmpy2
 import primefac
 from contextlib import contextmanager
 import pyperclip
+from math import ceil, sqrt
 
 
 @contextmanager
@@ -101,7 +102,7 @@ class YARSA:
     def find_primes(self):
         try:
             list_primes = list(primefac.primefac(self.n))
-            if args.list_primes:
+            if self.args.list_primes:
                 self.print_not_silent("Found Prime Factors:")
                 self.print_not_silent(list_primes)
             self.phi = 1
@@ -118,7 +119,7 @@ class YARSA:
         if results['status'] != 'CF' and results['status'] != 'FF':
             return False
         else:
-            if args.list_primes:
+            if self.args.list_primes:
                 self.print_not_silent("Found Factors:")
                 self.print_not_silent(results['factors'])
             self.phi = 1
@@ -142,11 +143,14 @@ class YARSA:
     def search_for_attacks(self):
         if self.small_e():
             self.print_not_silent("Attacking RSA with small e")
-            result = self.formatted(self.m)
             self.print_dec()
             exit(0)
         if self.wiener():
             self.print_not_silent('Hit Wiener Attack!')
+            self.print_dec()
+            exit(0)
+        if self.fermat():
+            self.print_not_silent('Hit Fermat Factorization!')
             self.print_dec()
             exit(0)
 
@@ -172,6 +176,34 @@ class YARSA:
             return True
         else:
             return False
+
+    def fermat(self):
+        factors = []
+        a = int(gmpy2.sqrt(self.n))
+        b = a*a - self.n
+        count = 0
+        while True:
+            count += 1
+            if count == 1000000:
+                break
+            a += 1
+            b = a*a - self.n
+            if gmpy2.is_square(b):
+                b = int(gmpy2.sqrt(b))
+                factors.append(a+b)
+                factors.append(a-b)
+                temp_n = 1
+                self.phi = 1
+                for factor in factors:
+                    temp_n *= factor
+                    self.phi *= factor - 1
+                if temp_n == self.n:
+                    if self.args.list_primes:
+                        self.print_not_silent("Found Factors:")
+                        self.print_not_silent(factors)
+                    if self.final_dec():
+                        return True
+        return False
 
     def print_not_silent(self, s):
         if not self.args.silent:
