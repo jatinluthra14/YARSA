@@ -232,7 +232,7 @@ class YARSA:
                 pyperclip.copy(self.flag)
                 exit(0)
             except Exception as e:
-                self.print_not_silent(e)
+                pass
         self.print_not_silent("Found Plaintext(s): ")
         print(self.formatted(self.m))
 
